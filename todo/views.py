@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from .models import Todo
 from .serializer import TodoSerializer
+from  rest_auth.views import LoginView
+from  rest_auth.serializers import LoginSerializer
 from rest_framework.generics import ListCreateAPIView, RetrieveDestroyAPIView, RetrieveUpdateAPIView
 
 class TodoListView(ListCreateAPIView):
