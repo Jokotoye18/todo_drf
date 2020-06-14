@@ -11,6 +11,9 @@ djangorestframework = "*"
 django = "*"
 django-rest-auth = {extras = ["with_social"],version = "*"}
 coverage = "*"
+gunicorn = "*"
+python-decouple = "*"
+django-heroku = "*"
 
 [requires]
 python_version = "3.8"
