@@ -9,11 +9,17 @@ pylint = "*"
 [packages]
 djangorestframework = "*"
 django = "*"
-django-rest-auth = {extras = ["with_social"],version = "*"}
 coverage = "*"
 gunicorn = "*"
 python-decouple = "*"
 django-heroku = "*"
+drf-yasg = "*"
+django-admin-honeypot = "*"
+django-rest-auth = {extras = ["with_social"],version = "*"}
+django-allauth = "*"
+dj-database-url = "*"
+django-filter = "*"
+sentry-sdk = "*"
 
 [requires]
 python_version = "3.8"

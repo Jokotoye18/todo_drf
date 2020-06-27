@@ -11,8 +11,10 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+import dj_database_url
 from decouple import config, Csv
-
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
 import django_heroku
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -30,9 +32,16 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1', cast=Csv())
-
-
 # Application definition
+
+sentry_sdk.init(
+    dsn = config('SENTRY_DSN'),
+    integrations=[DjangoIntegration()],
+
+    # If you wish to associate users to errors (assuming you are using
+    # django.contrib.auth) you may enable sending PII data.
+    send_default_pii=True
+)
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -45,13 +54,18 @@ INSTALLED_APPS = [
     
     #third party app
     'allauth',
+    'allauth.account',
     'rest_auth.registration',
     'rest_framework',
     'rest_framework.authtoken',
     'rest_auth',
+    'drf_yasg',
+    'admin_honeypot',
+    'django_filters',
+    'allauth.socialaccount',
 
     #local app
-    'todo',
+    'todo.apps.TodoConfig',
 ]
 
 MIDDLEWARE = [
@@ -88,6 +102,8 @@ WSGI_APPLICATION = 'todo_rest_api.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
+# DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -114,6 +130,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+SITE_ID = 1
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
@@ -140,14 +157,36 @@ REST_FRAMEWORK = {
     ],
 
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication', 
         'rest_framework.authentication.TokenAuthentication'
     ],
 
-    'DEFAULT_RENDERER_CLASSES': [
-        'rest_framework.renderers.JSONRenderer',
-    ]
+    # 'DEFAULT_RENDERER_CLASSES': [
+    #     'rest_framework.renderers.JSONRenderer',
+    # ]
 }
 
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+#EMAIL_BACKEND = config('EMAIL_BACKEND')
+#EMAIL_HOST = config('EMAIL_HOST')
+#EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
+#EMAIL_PORT = config('EMAIL_PORT', cast=int)
+#EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+#EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+
+
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_LOGIN_ON_PASSWORD_RESET = True
+ACCOUNT_LOGOUT_ON_PASSWORD_CHANGE = True
+ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE =  True 
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True 
+ACCOUNT_USERNAME_REQUIRED  = True
+ACCOUNT_UNIQUE_USERNAME = True
+
+
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
+
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
 django_heroku.settings(locals())
